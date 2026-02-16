@@ -8,7 +8,8 @@ export const generatePDFReport = (
     nodeResults: Map<string, NodeResult>,
     edgeResults: Map<string, EdgeResult>,
     systemResult: SystemResult,
-    sldImage?: string
+    sldImage?: string,
+    feederName: string = 'Distribution Feeder'
 ) => {
     const doc = new jsPDF();
     const timestamp = new Date().toLocaleString();
@@ -18,15 +19,21 @@ export const generatePDFReport = (
     doc.setTextColor(15, 23, 42); // slate-900
     doc.text('PowerFlow Study Report', 14, 22);
 
-    doc.setFontSize(10);
+    if (feederName) {
+        doc.setFontSize(14);
+        doc.setTextColor(51, 65, 85); // slate-700
+        doc.text(`Feeder: ${feederName}`, 14, 30);
+    }
+
+    doc.setFontSize(9);
     doc.setTextColor(100);
-    doc.text(`Generated on: ${timestamp}`, 14, 30);
+    doc.text(`Generated on: ${timestamp}`, 14, feederName ? 35 : 30);
 
     doc.setDrawColor(200);
-    doc.line(14, 35, 196, 35);
+    doc.line(14, feederName ? 38 : 35, 196, feederName ? 38 : 35);
 
     // --- SLD Image ---
-    let summaryY = 50;
+    let summaryY = feederName ? 53 : 50;
     if (sldImage) {
         doc.setFontSize(14);
         doc.text('Network Diagram (SLD)', 14, 45);

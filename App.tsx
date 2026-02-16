@@ -8,6 +8,7 @@ import { HelpModal } from './components/HelpModal';
 import { useNetworkState } from './hooks/useNetworkState';
 import { Zap, HelpCircle, Undo2, Redo2, Download, Upload, FileText } from 'lucide-react'; // Added icons
 import { generatePDFReport } from './services/reportService';
+import { FeederNameModal } from './components/FeederNameModal';
 
 const App: React.FC = () => {
   // State from Custom Hook
@@ -29,6 +30,7 @@ const App: React.FC = () => {
 
   const [selection, setSelection] = useState<SelectionState>({ type: null, id: null });
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   // Derived State
   const sourceKv = useMemo(() => {
@@ -163,7 +165,11 @@ const App: React.FC = () => {
     });
   };
 
-  const handleReport = async () => {
+  const handleReport = () => {
+    setIsReportModalOpen(true);
+  };
+
+  const generateReport = async (feederName: string) => {
     const sldImage = await captureSldImage();
     generatePDFReport(
       nodes,
@@ -171,13 +177,19 @@ const App: React.FC = () => {
       results.nodeResults,
       results.edgeResults,
       results.systemResult,
-      sldImage
+      sldImage,
+      feederName
     );
   };
 
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-950 text-gray-100 font-sans">
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <FeederNameModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        onConfirm={generateReport}
+      />
 
       {/* Header */}
       <header className="h-16 bg-gray-900 border-b border-gray-800 flex items-center px-4 justify-between shrink-0 z-10 overflow-x-auto no-scrollbar">
